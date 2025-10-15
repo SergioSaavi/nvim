@@ -14,6 +14,8 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	end
 end
 vim.opt.rtp:prepend(lazypath)
+-- Map 'jk' to <Esc> in insert mode
+vim.keymap.set('i', 'jk', '<Esc>', { noremap = true, silent = true })
 
 -- Make sure to setup `mapleader` and `maplocalleader` before
 -- loading lazy.nvim so that mappings are correct.
