@@ -45,7 +45,7 @@ vim.opt.completeopt = "menu,menuone,noselect"
 -- Yank to clipboar
 vim.opt.clipboard = "unnamedplus"
 
-vim.keymap.set("n", "<leader>o", "<cmd>Oil<CR>", { desc = "Open [O]il file explorer" })
+vim.keymap.set("n", "<leader>e", "<cmd>Oil<CR>", { desc = "Open [O]il file explorer" })
 vim.keymap.set("n", "<leader>O", function()
 	require("oil").toggle_float()
 end, { desc = "Toggle [O]il floating view" })
@@ -241,7 +241,12 @@ require("lazy").setup({
 				-- Automatically install LSPs and related tools to stdpath for Neovim
 				-- Mason must be loaded before its dependents so we need to set it up here.
 				-- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
-				{ 'mason-org/mason.nvim', opts = {} },
+				{ 'mason-org/mason.nvim', opts = {
+					registries = {
+        "github:mason-org/mason-registry",
+        "github:Crashdummyy/mason-registry",
+    },
+				} },
 				'mason-org/mason-lspconfig.nvim',
 				'WhoIsSethDaniel/mason-tool-installer.nvim',
 
@@ -294,6 +299,7 @@ require("lazy").setup({
 							vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
 						end
 
+						map("<leader>se", vim.lsp.buf.code_action, "Code Action")
 						-- Rename the variable under your cursor.
 						--  Most Language Servers support renaming across files, etc.
 						map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
@@ -312,7 +318,8 @@ require("lazy").setup({
 						-- Jump to the definition of the word under your cursor.
 						--  This is where a variable was first declared, or where a function is defined, etc.
 						--  To jump back, press <C-t>.
-						map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+						---map('gd', vim.lsp.buf.definition, 'Goto [D]efinition')
+						map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
 
 						-- WARN: This is not Goto Definition, this is Goto Declaration.
 						--  For example, in C this would take you to the header.
@@ -452,7 +459,7 @@ require("lazy").setup({
 					-- ts_ls = {},
 					--
 					-- … your other servers …
-
+					omnisharp = {},
 					-- vtsls with Vue support via @vue/typescript-plugin
 					vtsls = {
 						filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
