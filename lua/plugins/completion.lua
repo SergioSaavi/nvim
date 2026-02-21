@@ -23,7 +23,6 @@ return {
 			preset = 'default',
 			['<CR>'] = { 'select_and_accept', 'fallback' },
 			['<Tab>'] = { 'select_and_accept', 'fallback' },
-			['<Space>'] = { 'accept', 'fallback' },
 		},
 		appearance = {
 			nerd_font_variant = 'mono',

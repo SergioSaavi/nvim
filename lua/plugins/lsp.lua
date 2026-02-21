@@ -117,66 +117,42 @@ return {
 
 			local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-			-- Vue + TypeScript support
+			-- Vue + TypeScript support (modern vue_ls + vtsls setup)
 			local vue_language_server_path = vim.fn.stdpath("data")
 				.. "/mason/packages/vue-language-server/node_modules/@vue/language-server"
+
+			local vue_plugin = {
+				name = "@vue/typescript-plugin",
+				location = vue_language_server_path,
+				languages = { "vue" },
+				configNamespace = "typescript",
+				enableForWorkspaceTypeScriptVersions = true,
+			}
 
 			local servers = {
 				gopls = {},
 				tinymist = {},
 				vtsls = {
 					filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
-					root_dir = function(fname)
-						local util = require('lspconfig.util')
-						return util.root_pattern('package.json', 'tsconfig.json', 'jsconfig.json', '.git')(fname)
-					end,
 					init_options = {
 						plugins = {
-							{
-								name = "@vue/typescript-plugin",
-								location = vue_language_server_path,
-								languages = { "vue" },
-							},
+							vue_plugin,
 						},
 					},
 					settings = {
 						vtsls = {
 							tsserver = {
 								globalPlugins = {
-									{
-										name = "@vue/typescript-plugin",
-										location = vue_language_server_path,
-										languages = { "vue" },
-										configNamespace = "typescript",
-										enableForWorkspaceTypeScriptVersions = true,
-									},
+									vue_plugin,
 								},
 							},
 						},
 					},
 				},
-				volar = {
-					root_dir = function(fname)
-						local util = require('lspconfig.util')
-						return util.root_pattern('package.json', 'vue.config.js', 'nuxt.config.js', '.git')(fname)
-					end,
-					on_init = function(client)
-						client.handlers["tsserver/request"] = function(_, result, context)
-							local clients = vim.lsp.get_clients({ bufnr = context.bufnr, name = "vtsls" })
-							if #clients == 0 then return end
-							local ts_client = clients[1]
-							local param = unpack(result)
-							local id, command, payload = unpack(param)
-							ts_client:exec_cmd({
-								title = "vue_request_forward",
-								command = "typescript.tsserverRequest",
-								arguments = { command, payload },
-							}, { bufnr = context.bufnr }, function(_, r)
-								local response_data = { { id, r and r.body } }
-								client:notify("tsserver/response", response_data)
-							end)
-						end
-					end,
+				vue_ls = {
+					cmd = { 'vue-language-server', '--stdio' },
+					filetypes = { 'vue' },
+					root_markers = { 'package.json' },
 				},
 				lua_ls = {
 					settings = {
@@ -190,7 +166,7 @@ return {
 			local ensure_installed = vim.tbl_keys(servers or {})
 
 			for i, name in ipairs(ensure_installed) do
-				if name == "volar" then
+				if name == "vue_ls" then
 					table.remove(ensure_installed, i)
 					break
 				end
@@ -204,41 +180,32 @@ return {
 
 			require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+			local configured_servers = {}
+			local function setup_server(server_name)
+				if configured_servers[server_name] then return end
+				if server_name == "omnisharp" then return end
+				local server = servers[server_name]
+				if not server then return end
+				server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+				vim.lsp.config(server_name, server)
+				vim.lsp.enable(server_name)
+				configured_servers[server_name] = true
+			end
+
 			require('mason-lspconfig').setup {
 				ensure_installed = {},
 				automatic_installation = false,
 				handlers = {
 					function(server_name)
-						if server_name == "omnisharp" then return end
-						local server = servers[server_name] or {}
-						server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-						require('lspconfig')[server_name].setup(server)
+						setup_server(server_name)
 					end,
 				},
 			}
 
-			-- Manually attach vtsls to .vue files
-			vim.api.nvim_create_autocmd("FileType", {
-				pattern = "vue",
-				callback = function(ev)
-					vim.schedule(function()
-						local clients = vim.lsp.get_clients({ bufnr = ev.buf, name = "vtsls" })
-						if #clients > 0 then return end
-						local vtsls_config = servers.vtsls or {}
-						local root_dir = vtsls_config.root_dir and vtsls_config.root_dir(vim.api.nvim_buf_get_name(ev.buf))
-						if root_dir then
-							vim.lsp.start({
-								name = "vtsls",
-								cmd = { "vtsls", "--stdio" },
-								root_dir = root_dir,
-								init_options = vtsls_config.init_options,
-								settings = vtsls_config.settings,
-								capabilities = capabilities,
-							})
-						end
-					end)
-				end,
-			})
+			-- Ensure Vue pair is always configured even if mason-lspconfig handler misses them.
+			setup_server("vtsls")
+			setup_server("vue_ls")
+
 		end,
 	},
 
