@@ -131,6 +131,7 @@ return {
 
 			local servers = {
 				gopls = {},
+				rust_analyzer = {},
 				tinymist = {},
 				vtsls = {
 					filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },

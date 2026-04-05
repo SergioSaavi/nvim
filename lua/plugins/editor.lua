@@ -27,6 +27,24 @@ return {
 		},
 	},
 
+	-- Diff view for reviewing repo changes in one tab
+	{
+		"sindrets/diffview.nvim",
+		cmd = {
+			"DiffviewOpen",
+			"DiffviewClose",
+			"DiffviewFileHistory",
+			"DiffviewFocusFiles",
+			"DiffviewToggleFiles",
+		},
+		keys = {
+			{ "<leader>gd", "<cmd>DiffviewOpen<CR>", desc = "[G]it [D]iff view" },
+			{ "<leader>gD", "<cmd>DiffviewClose<CR>", desc = "[G]it [D]iff view close" },
+			{ "<leader>gh", "<cmd>DiffviewFileHistory %<CR>", desc = "[G]it file [H]istory" },
+		},
+		opts = {},
+	},
+
 	-- Indent guides
 	{
 		"lukas-reineke/indent-blankline.nvim",
@@ -99,4 +117,3 @@ return {
 		opts = {},
 	},
 }
-
