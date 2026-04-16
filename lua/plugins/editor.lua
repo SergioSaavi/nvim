@@ -29,7 +29,7 @@ return {
 
 	-- Diff view for reviewing repo changes in one tab
 	{
-		"sindrets/diffview.nvim",
+		"dlyongemallo/diffview.nvim",
 		cmd = {
 			"DiffviewOpen",
 			"DiffviewClose",
@@ -37,12 +37,58 @@ return {
 			"DiffviewFocusFiles",
 			"DiffviewToggleFiles",
 		},
+		init = function()
+			pcall(vim.api.nvim_del_user_command, "DiffviewRecover")
+			vim.api.nvim_create_user_command("DiffviewRecover", function()
+				require("config.diffview_recover").recover()
+			end, { desc = "Recover stale Diffview, buffer, and LSP state" })
+
+			vim.keymap.set("n", "<leader>gF", "<cmd>DiffviewRecover<CR>", {
+				desc = "[G]it [F]ix stale review state",
+			})
+		end,
 		keys = {
 			{ "<leader>gd", "<cmd>DiffviewOpen<CR>", desc = "[G]it [D]iff view" },
 			{ "<leader>gD", "<cmd>DiffviewClose<CR>", desc = "[G]it [D]iff view close" },
 			{ "<leader>gh", "<cmd>DiffviewFileHistory %<CR>", desc = "[G]it file [H]istory" },
 		},
-		opts = {},
+		opts = function()
+			local actions = require("diffview.actions")
+			local autorefresh = require("config.diffview_autorefresh")
+
+			return {
+				view = {
+					default = {
+						layout = "diff2_horizontal",
+					},
+					file_history = {
+						layout = "diff2_horizontal",
+					},
+					cycle_layouts = {
+						default = { "diff2_horizontal", "diff2_vertical", "diff1_plain" },
+					},
+				},
+				hooks = {
+					view_opened = function(view)
+						autorefresh.start(view, 3000)
+					end,
+					view_closed = function(view)
+						autorefresh.stop(view)
+					end,
+				},
+				keymaps = {
+					view = {
+						{ "n", "<leader>gz", actions.set_layout("diff1_plain"), { desc = "[G]it one-pane view" } },
+					},
+					file_panel = {
+						{ "n", "<leader>gz", actions.set_layout("diff1_plain"), { desc = "[G]it one-pane view" } },
+					},
+					file_history_panel = {
+						{ "n", "<leader>gz", actions.set_layout("diff1_plain"), { desc = "[G]it one-pane view" } },
+					},
+				},
+			}
+		end,
 	},
 
 	-- Indent guides

@@ -1,0 +1,5 @@
+WRN 2026-04-05T13:14:04.013 ?.69400    server_start:199: Failed to start server: operation not permitted: /var/folders/35/20cq8n4j7tb31yn8vw9qpktm0000gn/T/nvim.sergio/OVuLDv/nvim.69400.0
+WRN 2026-04-05T13:14:18.749 ?.69567    server_start:199: Failed to start server: operation not permitted: /var/folders/35/20cq8n4j7tb31yn8vw9qpktm0000gn/T/nvim.sergio/1xZ1K3/nvim.69567.0
+WRN 2026-04-08T16:37:44.064 ?.94877    server_start:199: Failed to start server: operation not permitted: /var/folders/35/20cq8n4j7tb31yn8vw9qpktm0000gn/T/nvim.sergio/ecPyYS/nvim.94877.0
+WRN 2026-04-08T16:42:15.115 ?.95425    server_start:199: Failed to start server: operation not permitted: /var/folders/35/20cq8n4j7tb31yn8vw9qpktm0000gn/T/nvim.sergio/kQcX6g/nvim.95425.0
+WRN 2026-04-08T16:49:47.563 ?.214      server_start:199: Failed to start server: operation not permitted: /var/folders/35/20cq8n4j7tb31yn8vw9qpktm0000gn/T/nvim.sergio/54PrgI/nvim.214.0
