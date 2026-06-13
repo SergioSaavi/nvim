@@ -2,6 +2,8 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
+vim.lsp.log.set_level(vim.log.levels.WARN)
+
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.wrap = false
@@ -19,4 +21,3 @@ vim.opt.ignorecase = true
 vim.opt.undofile = true
 vim.opt.completeopt = "menu,menuone,noselect"
 vim.opt.clipboard = "unnamedplus"
-

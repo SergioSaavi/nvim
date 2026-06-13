@@ -116,7 +116,7 @@ local function restart_lsp_clients()
 	local client_count = #vim.lsp.get_clients()
 
 	if client_count > 0 then
-		pcall(vim.cmd, "silent! LspRestart")
+		pcall(vim.cmd, "silent! lsp restart")
 	end
 
 	return client_count

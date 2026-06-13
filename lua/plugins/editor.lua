@@ -60,13 +60,18 @@ return {
 				view = {
 					default = {
 						layout = "diff2_horizontal",
+						winbar_info = true,
 					},
 					file_history = {
 						layout = "diff2_horizontal",
+						winbar_info = true,
 					},
 					cycle_layouts = {
 						default = { "diff2_horizontal", "diff2_vertical", "diff1_plain" },
 					},
+				},
+				file_panel = {
+					show_branch_name = true,
 				},
 				hooks = {
 					view_opened = function(view)
